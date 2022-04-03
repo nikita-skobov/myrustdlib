@@ -6,6 +6,7 @@ use std::{io, fmt::{Display, Debug}};
 /// that aren't defined in your library, so by wrapping a
 /// string in a struct, we can define out own impl and conversions.
 /// for example, we implement `From<io::Error> for Serr`
+#[derive(Debug)]
 pub struct Serr {
     pub err: String,
 }
