@@ -1,4 +1,4 @@
-use std::io;
+use std::{io, fmt::Display};
 
 
 /// String + error = Serr
@@ -15,8 +15,39 @@ impl From<io::Error> for Serr {
         Serr { err: src.to_string() }
     }
 }
+impl From<&str> for Serr {
+    fn from(src: &str) -> Self {
+        Serr { err: src.to_string() }
+    }
+}
+impl Display for Serr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&self.err)
+    }
+}
 
 pub type Sresult<T> = Result<T, Serr>;
+
+/// a lot of times your program just
+/// needs to get the first CLI argument,
+/// or just error out...
+pub fn first_cli_arg() -> Sresult<String> {
+    let args: Vec<_> = std::env::args().skip(1).collect();
+    let first = args.first().ok_or("Missing first CLI argument")?;
+    Ok(first.into())
+}
+
+#[macro_export]
+macro_rules! main_or_exit {
+    ($mainfn:tt) => {
+        fn main() {
+            if let Err(e) = $mainfn() {
+                eprintln!("{}", e);
+                std::process::exit(1);
+            }
+        }
+    };
+}
 
 #[cfg(test)]
 mod test {
