@@ -1,4 +1,4 @@
-use std::{io, fmt::Display};
+use std::{io, fmt::{Display, Debug}};
 
 
 /// String + error = Serr
@@ -18,6 +18,21 @@ impl From<io::Error> for Serr {
 impl From<&str> for Serr {
     fn from(src: &str) -> Self {
         Serr { err: src.to_string() }
+    }
+}
+impl From<String> for Serr {
+    fn from(src: String) -> Self {
+        Serr { err: src }
+    }
+}
+impl From<&String> for Serr {
+    fn from(src: &String) -> Self {
+        Serr { err: src.to_string() }
+    }
+}
+impl<T: Debug> From<Box<T>> for Serr {
+    fn from(src: Box<T>) -> Self {
+        Serr { err: format!("{:?}", src) }
     }
 }
 impl Display for Serr {
@@ -48,6 +63,7 @@ macro_rules! main_or_exit {
         }
     };
 }
+
 
 #[cfg(test)]
 mod test {
